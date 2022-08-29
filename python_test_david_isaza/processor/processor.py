@@ -1,3 +1,4 @@
+from typing import Callable
 import numpy as np
 from baseProcessor import BaseProcessor, SizeImageException
 
@@ -11,7 +12,6 @@ class Lens(BaseProcessor):
         self.width = width
 
     def process(image: np.ndarray) -> np.ndarray:
-
         try:
             if image is not None:
                 if image.shape == (self.height,self.width):
@@ -42,18 +42,40 @@ class Lens(BaseProcessor):
         self.__width = width
 
 
+    @property
+    def funct(self) -> Callable:
+        return self.__funct
+
+    @funct.setter
+    def funct(self, funct:Callable):
+        self.__funct = funct
+
+
+
+def lens():
+    def decorator(funct:Callable):
+        def wrapper(image,height,width):
+            len_dec = Lens(height,width)
+            a = len_dec.process(image)
+            b = funct(image)
+        return wrapper
+    return decorator
+
 class Sensor(BaseProcessor):
 
     def __init__(self,gain: float,enable = False) -> None:
         self.gain = gain
         self.enable = enable
 
-    def process(image: np.ndarray) -> np.ndarray:
+
+    @lens()
+    def process(image: np.ndarray, height:int = 0, width:int = 0) -> np.ndarray:
         try:
             if image is not None:
                 return image*self.gain
         except ValueError as e:
             print(f"Array doesn't have info: {e}")
+
 
     @property
     def gain(self) -> float:
