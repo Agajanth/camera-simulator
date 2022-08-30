@@ -1,6 +1,6 @@
 from typing import Callable
 import numpy as np
-from baseProcessor import BaseProcessor, SizeImageException
+from .baseProcessor import BaseProcessor, SizeImageException
 
 
 
@@ -11,19 +11,15 @@ class Lens(BaseProcessor):
         self.height = height
         self.width = width
 
-    def process(image: np.ndarray) -> np.ndarray:
-        try:
-            if image is not None:
-                if image.shape == (self.height,self.width):
-                    return image
-                else:
-                    raise SizeImageException("The dimension of the np-image doesn't match with the accepted size")
+    def process(self,image: np.ndarray) -> np.ndarray:
+
+        if image is not None:
+            if image.shape == (self.height,self.width):
+                return image
             else:
-                Exception("image is None")
-
-        except Exception as e:
-            print(f"Exception has raisen in proccess method: {e}" )
-
+                raise SizeImageException("The dimension of the np-image doesn't match with the accepted size")
+        else:
+            raise Exception("image is None")
 
     @property
     def height(self) -> int:
