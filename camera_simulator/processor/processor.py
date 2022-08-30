@@ -1,25 +1,28 @@
+import re
 from typing import Callable
 import numpy as np
 from .baseProcessor import BaseProcessor, SizeImageException
-
+import functools
 
 
 class Lens(BaseProcessor):
 
-    def __init__(self,height:int,width:int,enable:bool = False):
+    def __init__(self,height:int,width:int,enable:bool = True):
         self.enable = enable
         self.height = height
         self.width = width
 
     def process(self,image: np.ndarray) -> np.ndarray:
-
-        if image is not None:
-            if image.shape == (self.height,self.width):
-                return image
+        if self.enable:
+            if image is not None:
+                if image.shape == (self.height,self.width):
+                    return image
+                else:
+                    raise SizeImageException("The dimension of the np-image doesn't match with the accepted size")
             else:
-                raise SizeImageException("The dimension of the np-image doesn't match with the accepted size")
+                raise Exception("image is None")
         else:
-            raise Exception("image is None")
+            return "The lens class is not enable"
 
     @property
     def height(self) -> int:
@@ -27,7 +30,14 @@ class Lens(BaseProcessor):
 
     @height.setter
     def height(self, height:int):
-        self.__height = height
+        if isinstance(height,int) :
+            if height >=0:
+                self.__height = height
+            else:
+                raise ValueError("Height must be a positive integer")
+
+        else:
+            raise ValueError("Height must be a positive integer")
 
     @property
     def width(self) -> int:
@@ -35,37 +45,38 @@ class Lens(BaseProcessor):
 
     @width.setter
     def width(self,width:int):
-        self.__width = width
-
-
-    @property
-    def funct(self) -> Callable:
-        return self.__funct
-
-    @funct.setter
-    def funct(self, funct:Callable):
-        self.__funct = funct
+        if isinstance(width,int):
+            if width >=0 :
+                self.__width = width
+            else:
+                 raise ValueError("Width must be positive integer")
+        else:
+            raise ValueError("Width must be positive integer")
 
 
 
-def lens():
-    def decorator(funct:Callable):
-        def wrapper(image,height,width):
-            len_dec = Lens(height,width)
-            a = len_dec.process(image)
-            b = funct(image)
-        return wrapper
-    return decorator
+def lens(orig_func):
+    functools.wraps(orig_func)
+    def wrapper(*args,**kwds):
+        lens=Lens(args[2],args[3],args[4])
+        if lens.enable:
+            a = lens.process(args[1])
+        print(orig_func)
+        result = orig_func(*args,**kwds)
+        print(result)
+        return result
+    return wrapper
+
 
 class Sensor(BaseProcessor):
 
-    def __init__(self,gain: float,enable = False) -> None:
+    def __init__(self,gain: float,enable = True) -> None:
         self.gain = gain
         self.enable = enable
 
 
-    @lens()
-    def process(image: np.ndarray, height:int = 0, width:int = 0) -> np.ndarray:
+    @lens
+    def process(self,image: np.ndarray, height:int = 0, width:int = 0, enable:bool = False) -> np.ndarray:
         try:
             if image is not None:
                 return image*self.gain
@@ -79,12 +90,12 @@ class Sensor(BaseProcessor):
 
     @gain.setter
     def gain(self,gain:float):
-        try:
-            if gain > 0:
+        if isinstance(gain,float):
+            if gain >=0 :
                 self.__gain = gain
             else:
-                raise ValueError("gain shloud be greater than 0")
+                raise ValueError("Gain must be positive float")
+        else:
+            raise ValueError("Gain must be positive float")
 
-        except ValueError as e:
-            print(f"ValueError setting gain in Sensor: {e}")
 
