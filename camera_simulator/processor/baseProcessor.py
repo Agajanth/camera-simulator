@@ -3,14 +3,13 @@ import numpy as np
 
 
 class BaseProcessor(ABC):
-    """
-    BaseProcessor class to create an processor Interface
+    """BaseProcessor class to create an processor Interface
 
     properties:
-        enable : boolean
+        enable : boolean to enable functionalities in the child class
 
     methods:
-        process
+        process:  method for implementing a processing process
 
     """
     @abstractmethod
