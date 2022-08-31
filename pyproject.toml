@@ -7,6 +7,7 @@ authors = ["Agajanth <santiagoisaza0@gmail.com>"]
 [tool.poetry.scripts]
 pysensor = "camera_simulator.processor.processor:mymean"
 con = "camera_simulator.processor.processor:con"
+
 [tool.flit.metadata]
 module = "camera_simulator"
 author = "David Isaza"
