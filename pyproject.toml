@@ -1,8 +1,33 @@
 [tool.poetry]
-name = "python-test-david-isaza"
+name = "camera_simulator"
 version = "0.1.0"
 description = ""
 authors = ["Agajanth <santiagoisaza0@gmail.com>"]
+
+[tool.poetry.scripts]
+pysensor = "camera_simulator.processor.processor:mymean"
+con = "camera_simulator.processor.processor:con"
+[tool.flit.metadata]
+module = "camera_simulator"
+author = "David Isaza"
+author-email = "santiagoisaza0@gmail.com"
+home-page = "https://github.com/Agajanth/camera-simulator"
+classifiers = [
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development",
+    "Typing :: Typed",
+    "Environment :: Web Environment",
+    "Framework :: camera_simulator",
+    "Intended Audience :: Developers",
+    "License :: MIT License",
+    "Programming Language :: Python :: 3.10",
+]
+description-file = "README.md"
+requires-python = ">=3.10"
 
 [tool.poetry.dependencies]
 python = "^3.10"

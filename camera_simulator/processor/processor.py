@@ -3,7 +3,7 @@ from typing import Callable
 import numpy as np
 from .baseProcessor import BaseProcessor, SizeImageException
 import functools
-
+import concurrent.futures as cf
 
 class Lens(BaseProcessor):
 
@@ -61,9 +61,7 @@ def lens(orig_func):
         lens=Lens(args[2],args[3],args[4])
         if lens.enable:
             a = lens.process(args[1])
-        print(orig_func)
         result = orig_func(*args,**kwds)
-        print(result)
         return result
     return wrapper
 
@@ -77,11 +75,14 @@ class Sensor(BaseProcessor):
 
     @lens
     def process(self,image: np.ndarray, height:int = 0, width:int = 0, enable:bool = False) -> np.ndarray:
-        try:
-            if image is not None:
+        if image is not None and image.size >0:
+            if isinstance(image,np.ndarray):
                 return image*self.gain
-        except ValueError as e:
-            print(f"Array doesn't have info: {e}")
+            else:
+                raise ValueError("Array doesn't have info")
+        else:
+            raise ValueError("Array doesn't have info")
+
 
 
     @property
@@ -98,4 +99,14 @@ class Sensor(BaseProcessor):
         else:
             raise ValueError("Gain must be positive float")
 
+def mymean():
+    random_image = np.random.random((100,100))
+    sensor = Sensor(1.0)
+    result = np.mean(sensor.process(random_image,100,100,True))
+    print(result)
+    return result
 
+def con():
+    worker = cf.ProcessPoolExecutor(max_workers=5)
+    for i in range(100):
+        print(f"iteration {i}, result = {worker.submit(mymean)}")

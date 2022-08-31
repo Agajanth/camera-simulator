@@ -10,7 +10,8 @@ ZERO_HEIGHT:int = 0
 ZERO_WIDTH:int =  0
 VOID_IMAGE = np.array([[]])
 ZERO_GAIN:int = 0
-INVALID_GAIN:int = 0
+INVALID_GAIN:int = -1.0
+GAIN:int = 1.0
 RANDOM_IMAGE = np.random.random((100,100))
 
 def get_data_types():
@@ -82,15 +83,20 @@ def test_setters_sensor(input) :
         sensor_pro = Sensor(input[0])
     assert err.type == ValueError
 
-
+@pytest.mark.parametrize("input",get_sensor_data())
+def test_process_sensor_with_positive_data_allowing_lens_process(input):
+    sensor_pro = Sensor(input[0])
+    assert sensor_pro.process(input[1],100,100,True).all() == (input[0]*input[1]).all()
 
 @pytest.mark.parametrize("input",get_sensor_data())
-def test_process_sensor_with_positive_data(input):
+def test_process_sensor_with_positive_data_without_lens_process(input):
     sensor_pro = Sensor(input[0])
-    a =  sensor_pro.process(input[1],100,100,True)
-    assert a.all() == (input[0]*input[1]).all()
+    assert sensor_pro.process(input[1],ZERO_HEIGHT,ZERO_WIDTH,False).all() == (input[0]*input[1]).all()
 
-
-
+def test_process_sensor_with_void_image():
+    sensor_pro = Sensor(GAIN)
+    with pytest.raises(ValueError) as err:
+        sensor_pro.process(VOID_IMAGE,ZERO_HEIGHT,ZERO_WIDTH,False)
+    assert err.type == ValueError
 
 
